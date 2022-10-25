@@ -8,14 +8,10 @@
 # Group members:
 
 
-Name: Nicholas Donald Goray 
-]
-Email: ndgoray@ucdavis.edu
+Name: Nicholas Donald Goray <br /> 
+Email: ndgoray@ucdavis.edu <br />
+Github: Nicholasontheroad <br />
 
-Github: Nicholasontheroad
-
-Name: Karissa Ning
-
-Email: kkning@ucdavis.edu
-
-Github: kkning13
+Name: Karissa Ning <br />
+Email: kkning@ucdavis.edu <br />
+Github: kkning13 <br />
