@@ -9,14 +9,18 @@
 
 
 Name: Nicholas Donald Goray <br /> 
-Email: ndgoray@ucdavis.edu <br />
+UCD Email: ndgoray@ucdavis.edu <br />
 Github: Nicholasontheroad <br />
 
 Name: Karissa Ning <br />
-Email: kkning@ucdavis.edu <br />
+ UCD Email: kkning@ucdavis.edu <br />
 Github: kkning13 <br />
 
 Name: Kevin Gui <br />
 Github name: kevin-gui <br />
 LinkedIn: linkedin.com/in/kevingui <br />
-ucd email: kjgui@ucdavis.edu <br />
+UCD email: kjgui@ucdavis.edu <br />
+
+Name: Owen Levinthal <br />
+Github name: owen311 <br />
+UCD email:  <br />
