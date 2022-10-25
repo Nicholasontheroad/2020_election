@@ -15,3 +15,8 @@ Github: Nicholasontheroad <br />
 Name: Karissa Ning <br />
 Email: kkning@ucdavis.edu <br />
 Github: kkning13 <br />
+
+Name: Kevin Gui <br />
+Github name: kevin-gui <br />
+LinkedIn: linkedin.com/in/kevingui <br />
+ucd email: kjgui@ucdavis.edu <br />
