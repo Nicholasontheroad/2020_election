@@ -1,6 +1,8 @@
 #location of dataset for this file:https://drive.proton.me/urls/S2NHR5FHCM#CTkK2erKUVSK
 
 ---
+title: "Population Trends Data Set"
+author: "Owen Levinthal" "Nicholas Goray" for "Prop 27 Deadline warriors at UC Davis"
 date: '2022-10-22'
 output: html_document
 ---
@@ -12,17 +14,27 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 install.packages("tidyverse")
 library("tidyverse")
+library("dplyr")
+library("tidyr")
 ```
 
 ```{r}
-#Data Preperation
+#Data Preparation
 
-#add location of folder the dataset  is in here.
+data <- read.csv("C:/Users/levin/Desktop/Population Trends in Internet Sports Gambling/PopTrendsBData3Aggs.csv")
 
-data <- read.csv("C:/Users/add location of folder here/PopTrendsBData3Aggs.csv")
+dim(data)
 
 #Here I am subtracting money won from money staked to figure out each persons net win/loss
 data <- transform(data, winloss = StakeA - WinA)
+
+#Identifying big spenders (arbitrary)
+data <- transform(data, bigspender = (StakeA > 50000))
+sum(data$bigspender)
+
+#Using birth year to create age metric
+data <- transform(data, Age = 2006 - BirthYear)
+data
 
 #Creating dataset with just StakeA outliers
 upperq <- quantile(data$StakeA)[4]
@@ -34,20 +46,119 @@ upperq <- quantile(data$winloss)[4]
 lowerq <- quantile(data$winloss)[2]
 iqr <- IQR(data$winloss)
 winloss_outliers <- data[which(data$winloss < (lowerq - iqr*3) | data$winloss > (upperq + iqr*3)),]
+
+winloss_losers <- data[which(data$winloss < 0),]
+
 ```
 
 ```{r}
 #Exploratory Data Analysis
 
+#Dataset Overview
+dim(data)
+#24 col
+#46339 rows
+
+#StakeA analysis
+
 summary(data$StakeA)
 # Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 #   0.0     98.8    305.4   2770.7   1040.0 843123.6
 
-
-#Here I am creating a box plot, and using quartile ranges to define outliers. The interquartile range is the difference between the 75% (upper) and 25% (lower) quartile. upper quartile + 3*interquartile range is the boundry for upper outliers, lower quartile - 3*interquartile range is the lower boundry for outliers.
 boxplot(data$StakeA, ylim = c(0, 3000))
-#Box plot is useless since there are 3391 outliers
-#refer back to summary statistic
+hist(data$StakeA,xlim = c(0, 50000), breaks = 500, main = "Frequency of Money Staked", xlab = 'Total Money Staked')
+
+print(summary(data$winloss))
+hist(data$winloss,xlim = c(-5000, 5000), breaks = 500, main = "Frequency of Total Money Won/Lost", xlab = 'Total Money Won/Lost')
+
+
+
+print(summary(data$Gender))
+data$Gender <- factor(data$Gender)
+hist(data$Gender, main = "Frequency of Gender", xlab = 'Gender', breaks = 2)
+
+print(summary(data$Age))
+hist(data$Age, main = "Frequency of Age", xlab = 'Age')
+
+print(cor(select(data, StakeA, winloss, Age, Gender, bigspender), method = "pearson", use = "complete.obs"))
+
+```
+
+```{r}
+#Looking at the differences in the money staked distribution between men and women.
+
+plot(data$Gender, data$StakeA)
+newdata <- subset(data, Gender == 1)
+newdata1 <- subset(data, Gender == 0)
+summary(newdata$StakeA)
+summary(newdata1$StakeA)
+
+boxplot(newdata$StakeA, newdata1$StakeA, ylim = c(0,3000), main = "Money Staked, Men/Women", xlab = "Men/Women")
+
+test <- wilcox.test(StakeA ~ Gender, data = data)
+print(test)
+
+#comparing money staked between men and women
+summary(data$StakeA[data$Gender == 1])
+summary(data$StakeA[data$Gender == 0])
+
+#winloss analysis for gender
+plot(data$Gender, data$winloss, main = "Winloss by Gender")
+print(summary(newdata$StakeA))
+print(summary(newdata1$StakeA))
+
+print(summary(newdata$winloss))
+print(summary(newdata1$winloss))
+
+boxplot(newdata$winloss, newdata1$winloss, ylim = c(-250,500), main = "Money Won/Lost, Men/Women", xlab = "Men vs Women", ylab = "Money Won/Lost")
+
+test <- wilcox.test(winloss ~ Gender, data = data)
+print(test)
+
+#Age analysis by Gender
+plot(data$Age, data$winloss)
+print(summary(newdata$Age))
+print(summary(newdata1$Age))
+
+boxplot(newdata$Age, newdata1$Age, main = "Age Distribution, Men/Women", xlab = "Men/Women", ylim = c(0, 80))
+
+test <- wilcox.test(Age ~ Gender, data = data)
+print(test)
+
+```
+```{r}
+#Age vs StakeA
+plot(data$Age, data$StakeA, main = 'Amount Bet by Age')
+
+hist(data$Age, main = "Age Frequency")
+
+n <- c(17:60)
+variance_StakeA <- c()
+for (i in n){
+  variance_StakeA <- append(variance_StakeA, var(na.omit(data$StakeA[data$Age == i])))
+  
+}
+plot(n, variance_StakeA, main = 'Variance of StakeA by Age', xlab = "Age", ylab = "Variance of StakeA")
+
+
+
+#Age vs winloss
+plot(data$Age, data$winloss, main = 'Winloss by Age')
+
+n <- c(17:60)
+variance_winloss <- c()
+for (i in n){
+  variance_winloss <- append(variance_winloss, var(na.omit(data$winloss[data$Age == i])))
+}
+plot(n, variance_winloss, xlab = "Age", ylab = 'Winloss Variance', main ='Winloss Variance by Age')
+
+```
+
+```{r}
+#StakeA_Outlier dataset analysis
+
+#Here I am using quartile ranges to define outliers. The interquartile range is the difference between the 75% (upper) and 25% (lower) quartile. upper quartile + 3*interquartile range is the boundry for upper outliers, lower quartile - 3*interquartile range is the lower boundry for outliers.
+
 upperq <- quantile(data$StakeA)
 lowerq <- quantile(data$StakeA)[2]
 iqr <- IQR(data$StakeA)
@@ -58,86 +169,39 @@ num_outliers
 nrow(data)
 #46339
 
-3391/46339
+Percent_of_outliers <- 3391/46339
 #0.0732, percentage of outliers, defined as 75% percentile +  3 * inter-quartile range.
 
-d <- density(data$StakeA)
-plot(d, xaxp=c(0, 15000, 10))
-#Change the x-axis
-```
-```{r}
 
-summary(data$winloss)
+print(summary(StakeA_outliers$Gender))
+print(summary(data$Gender))
 
-#    Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
-#-38310.23     20.00     57.75    259.08    163.95  77293.73
+boxplot(StakeA_outliers$StakeA[StakeA_outliers$Gender == 1], StakeA_outliers$StakeA[StakeA_outliers$Gender == 0], ylim = c(0,50000), main = "Total Money Staked (Outliers), M/W", xlab = 'Men/Women')
 
-#Doing the same analysis above but on the winloss metric I created.
-upperqu <- quantile(data$winloss)[4]
-lowerqu <- quantile(data$winloss)[2]
-iqr <- IQR(data$winloss)
-iqr
-#143.9522
-num_outliers1 <- sum(data$winloss < lowerqu - 3*iqr | data$winloss > upperqu + 3*iqr)
-num_outliers1
-#4840
-
-#Here I turn the winloss metric into a probability distribution (sort of effective, sort of not) and creating a histogram to roughly understand the distribution. This part could use some better graphs. I suck at graphs
-d_winloss <- density(data$winloss)
-plot(d_winloss, xlim=c(-1000, 1000))
-hist(data$winloss, breaks = 80)
+print(summary(StakeA_outliers$Age))
+print(summary(data$Age))
 
 ```
 
 ```{r}
+#winloss_loser analysis
 
-#Here I am creating a dataset of just upper outliers and exploring it. I need to do more exploratory analysis for this section
-data
-upperq <- quantile(data$StakeA)[4]
-upperq
-iqr <- IQR(data$StakeA)
-StakeA_outliers <- data[which(data$StakeA > (upperq + iqr*3)),]
-print(summary(StakeA_outliers))
+dim(winloss_losers)
+#5852 rows
+#vs 46339 rows of regular data
+#percent of betters who lose money
+Percent_losers <- 5852 / 46339
+Percent_losers
+#0.1262
 
-print(summary(data))
+print(summary(winloss_losers$Gender))
+print(summary(data$Gender))
+
+print(summary(winloss_losers$Age))
+print(summary(data$Age))
+
+boxplot(winloss_losers$StakeA[winloss_losers$Gender == 1], winloss_losers$StakeA[winloss_losers$Gender == 0], ylim = c(-500,5000), main = "Total Money Won/Lost (Outliers), M/W", xlab = 'Men/Women')
+
+
 ```
 
-```{r}
-#Same analysis as above but with upper and lower outliers
-data
-upperq <- quantile(data$winloss)[4]
-lowerq <- quantile(data$winloss)[2]
-iqr <- IQR(data$winloss)
-winloss_outliers <- data[which(data$winloss > (upperq + iqr*3) | data$winloss < (lowerq - iqr*3)),]
-print(summary(winloss_outliers))
-
-print(summary(data))
-```
-
-```{r}
-#Looking at the differences in the money staked distribution between men and women.
-test <- wilcox.test(StakeA ~ Gender, data = data)
-
-newdata <- subset(data, Gender == 1)
-newdata1 <- subset(data, Gender == 0)
-summary(newdata$StakeA)
-summary(newdata1$StakeA)
-
-newdata3 <- subset(StakeA_outliers, Gender == 1)
-newdata4 <- subset(StakeA_outliers, Gender == 0)
-summary(newdata3$StakeA)
-summary(newdata4$StakeA)
-#Women generally spend less money on sport betting
-#I'll add a statistical test to confirm this, and take note of test assumptions
-
-
-#comparing money staked between men and women
-summary(data$StakeA[data$Gender == 1])
-summary(data$StakeA[data$Gender == 0])
-
-#comparing money staked between men and women from outlier dataset (money staked)?
-```
-
-```{r}
-data
-```
