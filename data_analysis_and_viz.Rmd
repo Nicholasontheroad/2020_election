@@ -14,6 +14,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 install.packages("tidyverse")
+install.packages("ggplot2")
+install.packages('tidyverse')
+install.packages('tidyr')
+library("ggplot2")
 library("tidyverse")
 library("dplyr")
 library("tidyr")
@@ -21,8 +25,8 @@ library("tidyr")
 
 ```{r}
 #Data Preparation
-
-data <- read.csv("C:/Users/levin/Desktop/Population Trends in Internet Sports Gambling/PopTrendsBData3Aggs.csv")
+# you need to replace the location with the location you download the dataset in 
+data <- read.csv("C:/Users/your user name here/Desktop/Population Trends in Internet Sports Gambling/PopTrendsBData3Aggs.csv")
 
 dim(data)
 
@@ -95,6 +99,23 @@ summary(newdata$StakeA)
 summary(newdata1$StakeA)
 
 boxplot(newdata$StakeA, newdata1$StakeA, ylim = c(0,3000), main = "Money Staked, Men/Women", xlab = "Men/Women")
+
+
+p_1 <- ggplot(data = data, aes(x = Age, y = StakeA )) +
+    geom_point(alpha = 0.1)
+p_1 + ggtitle(label = "StakeA Plotted Against Age") + # for the main title
+xlab(label = "Age of Gambler") + # for the x axis label
+ylab(label = "StakeA") # for the y axis label
+p_1
+
+
+ggplot(data = data, aes(x = factor(Gender), y = winloss, color = factor(Gender) )) +
+  geom_point(alpha = 0.1) +
+  scale_x_discrete(labels = c("1" = "Male", "0" = "Female")) +
+  scale_color_manual(values = c("1" = "blue", "0" = "purple"), labels = c("0" = "Male", "1" = "Female")) +
+  ggtitle(label = "Winloss Plotted Against Gender") +
+  xlab(label = "Gender of Gambler") +
+  ylab(label = "Winloss" )
 
 test <- wilcox.test(StakeA ~ Gender, data = data)
 print(test)
