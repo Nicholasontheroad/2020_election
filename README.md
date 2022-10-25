@@ -23,4 +23,4 @@ UCD email: kjgui@ucdavis.edu <br />
 
 Name: Owen Levinthal <br />
 Github name: owen311 <br />
-UCD email:  <br />
+UCD email: olevinthal@ucdavis.edu  <br />
