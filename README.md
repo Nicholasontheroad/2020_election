@@ -9,9 +9,13 @@
 
 
 Name: Nicholas Donald Goray 
+]
 Email: ndgoray@ucdavis.edu
+
 Github: Nicholasontheroad
 
 Name: Karissa Ning
+
 Email: kkning@ucdavis.edu
+
 Github: kkning13
